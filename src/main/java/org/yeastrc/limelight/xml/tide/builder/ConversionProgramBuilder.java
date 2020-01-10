@@ -30,8 +30,6 @@ public class ConversionProgramBuilder {
 		xConversionProgram.setName( conversionProgramInfo.getName() );
 		xConversionProgram.setURI( conversionProgramInfo.getURI() );
 		xConversionProgram.setVersion( conversionProgramInfo.getVersion() );
-		
-		
 	}
 	
 	private XMLGregorianCalendar getXMLGregorianCalendar( LocalDateTime ldt ) throws DatatypeConfigurationException {

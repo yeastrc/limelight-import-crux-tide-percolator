@@ -7,7 +7,9 @@ public class TideResults {
 
 	private Map<TideReportedPeptide, Map<Integer, TidePSM>> peptidePSMMap;
 	private boolean computeSp = false;
-	private Map<String, BigDecimal> staticMods;
+	private Map<BigDecimal, Map<String, BigDecimal>> staticMods;
+	private Map<BigDecimal, Map<String, BigDecimal>> dynamicMods;
+	private String decoyPrefix;
 
 	/**
 	 * @return the peptidePSMMap
@@ -30,11 +32,27 @@ public class TideResults {
 		this.computeSp = computeSp;
 	}
 
-	public Map<String, BigDecimal> getStaticMods() {
+	public Map<BigDecimal, Map<String, BigDecimal>> getStaticMods() {
 		return staticMods;
 	}
 
-	public void setStaticMods(Map<String, BigDecimal> staticMods) {
+	public void setStaticMods(Map<BigDecimal, Map<String, BigDecimal>> staticMods) {
 		this.staticMods = staticMods;
+	}
+
+	public String getDecoyPrefix() {
+		return decoyPrefix;
+	}
+
+	public void setDecoyPrefix(String decoyPrefix) {
+		this.decoyPrefix = decoyPrefix;
+	}
+
+	public Map<BigDecimal, Map<String, BigDecimal>> getDynamicMods() {
+		return dynamicMods;
+	}
+
+	public void setDynamicMods(Map<BigDecimal, Map<String, BigDecimal>> dynamicMods) {
+		this.dynamicMods = dynamicMods;
 	}
 }

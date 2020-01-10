@@ -3,7 +3,6 @@ package org.yeastrc.limelight.xml.tide.utils;
 import static java.lang.Math.toIntExact;
 
 import java.io.File;
-import java.lang.reflect.Parameter;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,7 +23,6 @@ import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.MsmsRunSummary;
 import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.MsmsRunSummary.SearchSummary;
 import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery;
 import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery.SearchResult.SearchHit;
-import org.yeastrc.limelight.xml.tide.objects.CometParameters;
 
 public class TidePepXMLParsingUtils {
 
@@ -49,6 +47,23 @@ public class TidePepXMLParsingUtils {
 		}
 
 		return false;
+	}
+
+	public static String getDecoyPrefixFromXML( MsmsPipelineAnalysis msAnalysis ) {
+
+		for( MsmsRunSummary runSummary : msAnalysis.getMsmsRunSummary() ) {
+			for( SearchSummary searchSummary : runSummary.getSearchSummary() ) {
+
+				for( NameValueType nvt : searchSummary.getParameter() ) {
+					if(nvt.getName().equals("decoy-prefix")) {
+						return nvt.getValueAttribute();
+					}
+				}
+
+			}
+		}
+
+		return null;
 	}
 
 	public static Map<BigDecimal, Map<String, BigDecimal>> getStaticModsFromXML( MsmsPipelineAnalysis msAnalysis ) {
@@ -81,6 +96,36 @@ public class TidePepXMLParsingUtils {
 	}
 
 
+	public static Map<BigDecimal, Map<String, BigDecimal>> getDynamicModsFromXML( MsmsPipelineAnalysis msAnalysis ) {
+
+		Map<BigDecimal, Map<String, BigDecimal>> dynamicMods = new HashMap<>();
+
+		for( MsmsRunSummary runSummary : msAnalysis.getMsmsRunSummary() ) {
+			for( SearchSummary searchSummary : runSummary.getSearchSummary() ) {
+
+				for(SearchSummary.AminoacidModification xMod : searchSummary.getAminoacidModification() ) {
+					if(xMod.getVariable().equals("Y")) {
+						// we have a static mod
+
+						BigDecimal totalMass = xMod.getMass();
+						BigDecimal massDiff = xMod.getMassdiff();
+						String residue = xMod.getAminoacid();
+
+						if(!dynamicMods.containsKey(totalMass)) {
+							dynamicMods.put(totalMass, new HashMap<>());
+						}
+
+						dynamicMods.get(totalMass).put(residue, massDiff);
+					}
+				}
+
+			}
+		}
+
+		return dynamicMods;
+	}
+
+
 	/**
 	 * Return true if this searchHit is a decoy. This means that it only matches
 	 * decoy proteins.
@@ -88,16 +133,20 @@ public class TidePepXMLParsingUtils {
 	 * @param searchHit
 	 * @return
 	 */
-	public static boolean searchHitIsDecoy( SearchHit searchHit, CometParameters cometParams ) {
-		
+	public static boolean searchHitIsDecoy( SearchHit searchHit, String decoyPrefix) {
+
+		if(decoyPrefix == null) {
+			return false;
+		}
+
 		String protein = searchHit.getProtein();
 
-		if( CometParsingUtils.isDecoyProtein( protein, cometParams ) ) {
+		if( CometParsingUtils.isDecoyProtein( protein, decoyPrefix ) ) {
 
 			if( searchHit.getAlternativeProtein() != null ) {
 				for( AltProteinDataType ap : searchHit.getAlternativeProtein() ) {
 
-					if( !CometParsingUtils.isDecoyProtein( ap.getProtein(), cometParams ) ) {
+					if( !CometParsingUtils.isDecoyProtein( ap.getProtein(), decoyPrefix ) ) {
 						return false;
 					}
 				}
@@ -184,7 +233,9 @@ public class TidePepXMLParsingUtils {
 			int scanNumber,
 			BigDecimal obsMass,
 			BigDecimal retentionTime,
-			CometParameters cometParams ) throws Throwable {
+			String decoyPrefix,
+			Map<BigDecimal, Map<String, BigDecimal>> staticMods,
+			Map<BigDecimal, Map<String, BigDecimal>> dynamicMods) throws Throwable {
 				
 		TidePSM psm = new TidePSM();
 		
@@ -196,15 +247,14 @@ public class TidePepXMLParsingUtils {
 		
 		psm.setPeptideSequence( searchHit.getPeptide() );
 		
-		psm.setxCorr( getScoreForType( searchHit, "xcorr" ) );
+		psm.setxCorr( getScoreForType( searchHit, "xcorr_score" ) );
 		psm.setDeltaCn( getScoreForType( searchHit, "deltacn" ) );
-		psm.setDeltaCnStar( getScoreForType( searchHit, "deltacnstar" ) );
+		psm.setDeltaLCn( getScoreForType( searchHit, "deltalcn" ) );
 		psm.setSpScore( getScoreForType( searchHit, "spscore" ) );
 		psm.setSpRank( getScoreForType( searchHit, "sprank" ) );
-		psm.seteValue( getScoreForType( searchHit, "expect" ) );
 
 		try {
-			psm.setProteinNames( getProteinNamesForSearchHit( searchHit, cometParams ) );
+			psm.setProteinNames( getProteinNamesForSearchHit( searchHit, decoyPrefix ) );
 		} catch( Throwable t ) {
 
 			String error = "Error getting protein names for PSM.\n";
@@ -216,7 +266,7 @@ public class TidePepXMLParsingUtils {
 		}
 
 		try {
-			psm.setModifications( getModificationsForSearchHit( searchHit ) );
+			psm.setModifications( getModificationsForSearchHit( searchHit, staticMods, dynamicMods ) );
 		} catch( Throwable t ) {
 
 			String error = "Error getting mods for PSM.\n";
@@ -237,7 +287,7 @@ public class TidePepXMLParsingUtils {
 	}
 
 	/**
-	 * Get the requested score from the searchHit JAXB object
+	 * Get the requested score from the searchHit JAXB object. Returns null if it can't be found.
 	 *
 	 * @param searchHit
 	 * @param type
@@ -253,7 +303,7 @@ public class TidePepXMLParsingUtils {
 			}
 		}
 		
-		throw new Exception( "Could not find a score of name: " + type + " for PSM..." );		
+		return null;
 	}
 
 	/**
@@ -263,16 +313,22 @@ public class TidePepXMLParsingUtils {
 	 * @return
 	 * @throws Throwable
 	 */
-	public static Map<Integer, BigDecimal> getModificationsForSearchHit( SearchHit searchHit ) throws Throwable {
+	public static Map<Integer, BigDecimal> getModificationsForSearchHit( SearchHit searchHit,
+																		 Map<BigDecimal, Map<String, BigDecimal>> staticMods,
+																		 Map<BigDecimal, Map<String, BigDecimal>> dynamicMods) throws Throwable {
 		
 		Map<Integer, BigDecimal> modMap = new HashMap<>();
 		
 		ModInfoDataType mofo = searchHit.getModificationInfo();
 		if( mofo != null ) {
+
+			String peptide = searchHit.getPeptide();
+
 			for( ModAminoacidMass mod : mofo.getModAminoacidMass() ) {
-				
-				if( mod.getVariable() != null ) {
-					modMap.put( mod.getPosition().intValueExact(), BigDecimal.valueOf( mod.getVariable() ) );
+
+				if(!isModAStaticMod(mod, peptide, staticMods)) {
+					BigDecimal massDiff = getMassDiffForDynamicMod(mod, peptide, dynamicMods);
+					modMap.put(mod.getPosition().intValueExact(), massDiff);
 				}
 			}
 
@@ -291,18 +347,18 @@ public class TidePepXMLParsingUtils {
 		return modMap;
 	}
 
-	public static Collection<String> getProteinNamesForSearchHit(SearchHit searchHit, CometParameters cometParams ) throws Throwable {
+	public static Collection<String> getProteinNamesForSearchHit(SearchHit searchHit, String decoyPrefix ) throws Throwable {
 
 		Collection<String> proteins = new HashSet<>();
 
-		if( searchHit.getProtein() != null && !CometParsingUtils.isDecoyProtein( searchHit.getProtein(), cometParams ) ) {
+		if( searchHit.getProtein() != null && !CometParsingUtils.isDecoyProtein( searchHit.getProtein(), decoyPrefix ) ) {
 			proteins.add( searchHit.getProtein());
 		}
 
 		if( searchHit.getAlternativeProtein() != null && searchHit.getAlternativeProtein().size() > 0 ) {
 
 			for( AltProteinDataType apdt : searchHit.getAlternativeProtein() ) {
-				if( !CometParsingUtils.isDecoyProtein( apdt.getProtein(), cometParams ) ) {
+				if( !CometParsingUtils.isDecoyProtein( apdt.getProtein(), decoyPrefix ) ) {
 					proteins.add( apdt.getProtein() );
 				}
 			}
@@ -314,6 +370,46 @@ public class TidePepXMLParsingUtils {
 		}
 
 		return proteins;
+	}
+
+	private static BigDecimal getMassDiffForDynamicMod(ModAminoacidMass mod, String peptide, Map<BigDecimal, Map<String, BigDecimal>> dynamicMods) throws Exception {
+
+		if(dynamicMods == null || dynamicMods.keySet().size() < 1) {
+			throw new Exception("Dynamic mod found in results (" + mod + "), but no dynamic mods defined in search.");
+		}
+
+		BigDecimal modMass = BigDecimal.valueOf( mod.getMass() );
+
+		if( !dynamicMods.containsKey(modMass)) {
+			throw new Exception("Found a dynamic mod with mass " + modMass + " in results, but no dynamic mod w/ that mass was defined in the search." );
+		}
+
+		int position = (mod.getPosition()).intValueExact();
+		String residue = peptide.substring( position - 1, position );
+
+		if(dynamicMods.get(modMass).containsKey(residue)) {
+			return dynamicMods.get(modMass).get(residue);
+		}
+
+		throw new Exception("Got a mod mass of " + modMass + " on position " + position + " in peptide " + peptide + ", but no dynamic mod is defined with that mass for that residue in the search.");
+	}
+
+	private static boolean isModAStaticMod(ModAminoacidMass mod, String peptide, Map<BigDecimal, Map<String, BigDecimal>> staticMods) {
+
+		if(staticMods == null || staticMods.keySet().size() < 1) {
+			return false;
+		}
+
+		BigDecimal modMass = BigDecimal.valueOf( mod.getMass() );
+
+		if( !staticMods.containsKey(modMass)) {
+			return false;
+		}
+
+		int position = (mod.getPosition()).intValueExact();
+		String residue = peptide.substring( position - 1, position );
+
+		return staticMods.get(modMass).containsKey(residue);
 	}
 
 

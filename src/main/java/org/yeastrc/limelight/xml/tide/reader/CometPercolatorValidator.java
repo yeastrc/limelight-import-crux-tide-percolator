@@ -1,9 +1,9 @@
 package org.yeastrc.limelight.xml.tide.reader;
 
+import org.yeastrc.limelight.xml.tide.objects.PercolatorPeptideData;
+import org.yeastrc.limelight.xml.tide.objects.PercolatorResults;
 import org.yeastrc.limelight.xml.tide.objects.TideReportedPeptide;
 import org.yeastrc.limelight.xml.tide.objects.TideResults;
-import org.yeastrc.limelight.xml.tide.objects.IndexedPercolatorPeptideData;
-import org.yeastrc.limelight.xml.tide.objects.IndexedPercolatorResults;
 import org.yeastrc.limelight.xml.tide.utils.CometParsingUtils;
 
 public class CometPercolatorValidator {
@@ -15,23 +15,18 @@ public class CometPercolatorValidator {
 	 * @param percolatorResults
 	 * @throws Exception if the data could not be validated
 	 */
-	public static void validateData(TideResults tideResults, IndexedPercolatorResults percolatorResults, Integer fileIndex ) throws Exception {
+	public static void validateData(TideResults tideResults, PercolatorResults percolatorResults) throws Exception {
 
-		for( String percolatorReportedPeptide : percolatorResults.getIndexedReportedPeptideResults().keySet() ) {
+		for( String percolatorReportedPeptide : percolatorResults.getReportedPeptideResults().keySet() ) {
 
-			TideReportedPeptide tideReportedPeptide = CometParsingUtils.getCometReportedPeptideForString( percolatorReportedPeptide, tideResults);
-			IndexedPercolatorPeptideData indexedPercolatorPeptideData = percolatorResults.getIndexedReportedPeptideResults().get( percolatorReportedPeptide );
-
-			// There are no percolator data for this peptide in this file index
-			if( !indexedPercolatorPeptideData.getPercolatorPSMs().containsKey( fileIndex ) ) {
-				continue;
-			}
+			TideReportedPeptide tideReportedPeptide = CometParsingUtils.getTideReportedPeptideForString( percolatorReportedPeptide, tideResults);
+			PercolatorPeptideData percolatorPeptideData = percolatorResults.getReportedPeptideResults().get( percolatorReportedPeptide );
 
 			if( tideReportedPeptide == null ) {
 				throw new Exception( "Error: Comet results not found for peptide: " + percolatorReportedPeptide );
 			}
 
-			for( int scanNumber : indexedPercolatorPeptideData.getPercolatorPSMs().get( fileIndex ).keySet() ) {
+			for( int scanNumber : percolatorPeptideData.getPercolatorPSMs().keySet() ) {
 
 				if( !tideResults.getPeptidePSMMap().get(tideReportedPeptide).containsKey( scanNumber ) ) {
 					throw new Exception( "Error: Could not find PSM data for scan number " + scanNumber + " in percolator results for peptide: " + percolatorReportedPeptide );

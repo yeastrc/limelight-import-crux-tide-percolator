@@ -57,9 +57,11 @@ public class TidePepXMLResultsParser {
 		TideResults results = new TideResults();
 		results.setPeptidePSMMap( resultMap );
 
-		results.setCometVersion( TidePepXMLParsingUtils.getCometVersionFromXML( msAnalysis ) );
+		results.setComputeSp( TidePepXMLParsingUtils.getIsSpCalculatedFromXML( msAnalysis ));
+		results.setStaticMods( TidePepXMLParsingUtils.getStaticModsFromXML( msAnalysis ));
+		results.setDynamicMods( TidePepXMLParsingUtils.getDynamicModsFromXML( msAnalysis ));
+		results.setDecoyPrefix( TidePepXMLParsingUtils.getDecoyPrefixFromXML( msAnalysis ));
 
-		
 		for( MsmsRunSummary runSummary : msAnalysis.getMsmsRunSummary() ) {
 			for( SpectrumQuery spectrumQuery : runSummary.getSpectrumQuery() ) {
 				
@@ -72,7 +74,7 @@ public class TidePepXMLResultsParser {
 					for( SearchHit searchHit : searchResult.getSearchHit() ) {
 						
 						// do not include decoy hits
-						if( TidePepXMLParsingUtils.searchHitIsDecoy( searchHit, cometParams ) ) {
+						if( TidePepXMLParsingUtils.searchHitIsDecoy( searchHit, results.getDecoyPrefix() ) ) {
 							continue;
 						}
 						
@@ -80,7 +82,7 @@ public class TidePepXMLResultsParser {
 						
 						try {
 							
-							psm = TidePepXMLParsingUtils.getPsmFromSearchHit( searchHit, charge, scanNumber, neutralMass, retentionTime, cometParams  );
+							psm = TidePepXMLParsingUtils.getPsmFromSearchHit( searchHit, charge, scanNumber, neutralMass, retentionTime, results.getDecoyPrefix(), results.getStaticMods(), results.getDynamicMods() );
 							
 						} catch( Throwable t) {
 							

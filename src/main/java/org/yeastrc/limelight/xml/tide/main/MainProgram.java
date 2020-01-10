@@ -26,104 +26,79 @@ import org.yeastrc.limelight.xml.tide.constants.Constants;
 import org.yeastrc.limelight.xml.tide.objects.ConversionParameters;
 import org.yeastrc.limelight.xml.tide.objects.ConversionProgramInfo;
 
-import jargs.gnu.CmdLineParser;
-import jargs.gnu.CmdLineParser.IllegalOptionValueException;
-import jargs.gnu.CmdLineParser.UnknownOptionException;
+import picocli.CommandLine;
 
-/**
- * @author Michael Riffle
- * @date Feb 21, 2018
- *
- */
-public class MainProgram {
+@CommandLine.Command(name = "java -jar " + Constants.CONVERSION_PROGRAM_NAME,
+		mixinStandardHelpOptions = true,
+		version = Constants.CONVERSION_PROGRAM_NAME + " " + Constants.CONVERSION_PROGRAM_VERSION,
+		sortOptions = false,
+		synopsisHeading = "%n",
+		descriptionHeading = "%n@|bold,underline Description:|@%n%n",
+		optionListHeading = "%n@|bold,underline Options:|@%n",
+		description = "Convert the results of a Crux (Tide + Percolator) analysis to a Limelight XML file suitable for import into Limelight.\n\n" +
+				"More info at: " + Constants.CONVERSION_PROGRAM_URI
+)
+public class MainProgram implements Runnable {
 
-	public static void main( String[] args ) throws Throwable {
+	@CommandLine.Option(names = { "-d", "--directory" }, required = true, description = "Full path to the crux output directory. E.g., /data/my_analysis/crux-output")
+	private File cruxOutputDirectory;
+
+	@CommandLine.Option(names = { "-f", "--fasta-file" }, required = true, description = "Full path to FASTA file used in the experiment.")
+	private File fastaFile;
+
+	@CommandLine.Option(names = { "-o", "--out-file" }, required = true, description = "Full path to use for the Limelight XML output file (including file name).")
+	private File outFile;
+
+	@CommandLine.Option(names = { "-v", "--verbose" }, required = false, description = "If this parameter is present, error messages will include a full stacktrace. Helpful for debugging.")
+	private boolean verboseRequested = false;
+
+	private String[] args;
+
+	public void run() {
 
 		printRuntimeInfo();
 
-		if( args.length < 1 || args[ 0 ].equals( "-h" ) ) {
-			printHelp();
-			System.exit( 0 );
-		}
-
-		CmdLineParser cmdLineParser = new CmdLineParser();
-
-		CmdLineParser.Option cometParamOpt = cmdLineParser.addStringOption( 'c', "comet_params" );	
-		CmdLineParser.Option fastaFileOpt = cmdLineParser.addStringOption( 'f', "fasta" );
-		CmdLineParser.Option directoryOpt = cmdLineParser.addStringOption( 'd', "directory" );
-
-		// parse command line options
-		try { cmdLineParser.parse(args); }
-		catch (IllegalOptionValueException e) {
-			printHelp();
-			System.exit( 1 );
-		}
-		catch (UnknownOptionException e) {
-			printHelp();
-			System.exit( 1 );
-		}
-
-		String cometParamFilePath = (String)cmdLineParser.getOptionValue( cometParamOpt );
-		String fastaFilePath = (String)cmdLineParser.getOptionValue( fastaFileOpt );
-		String cruxDirectoryName = (String)cmdLineParser.getOptionValue( directoryOpt );
-
-		File cometParamFile = new File( cometParamFilePath );
-		if( !cometParamFile.exists() ) {
-			System.err.println( "Could not find comet params file: " + cometParamFilePath );
-			System.exit( 1 );
-		}
-
-		File fastaFile = new File( fastaFilePath );
 		if( !fastaFile.exists() ) {
-			System.err.println( "Could not find fasta file: " + fastaFilePath );
+			System.err.println( "Could not find fasta file: " + fastaFile.getAbsolutePath() );
 			System.exit( 1 );
 		}
 
-		File cruxDirectory = new File( cruxDirectoryName );
-		if( !cruxDirectory.exists() ) {
-			System.err.println( "Could not find crux directory: " + cruxDirectoryName );
+		if( !cruxOutputDirectory.exists() ) {
+			System.err.println( "Could not find crux directory: " + cruxOutputDirectory.getAbsolutePath() );
 			System.exit( 1 );
 		}
 
-		ConversionProgramInfo cpi = ConversionProgramInfo.createInstance( String.join( " ",  args ) );        
+		if( !cruxOutputDirectory.isDirectory() ) {
+			System.err.println( "Crux output directory isn't a directory: " + cruxOutputDirectory.getAbsolutePath() );
+			System.exit( 1 );
+		}
 
-		ConversionParameters cp = new ConversionParameters();
-		cp.setConversionProgramInfo( cpi );
-		cp.setFastaFile( fastaFile );
-		cp.setCometParametersFile( cometParamFile );
-		cp.setCruxOutputDirectory( cruxDirectory );
+		ConversionProgramInfo cpi = ConversionProgramInfo.createInstance( String.join( " ",  args ) );
+		ConversionParameters cp = new ConversionParameters(cruxOutputDirectory, fastaFile, outFile);
 
-		//try {
+		try {
 			ConverterRunner.createInstance().convertCruxTidePercolatorToLimelightXML(cp);
-//		} catch( Throwable t ) {
-//			System.err.println( "Encountered error during conversion: " + t.getMessage() );
-//			System.exit( 1 );
-//		}
+		} catch( Throwable t ) {
+			System.err.println( "Encountered error during conversion: " + t.getMessage() );
+			System.exit( 1 );
+		}
 
 		System.exit( 0 );
 	}
 
-	/**
-	 * Print help to STD OUT
-	 */
-	public static void printHelp() {
+	public static void main( String[] args ) {
 
-		try( BufferedReader br = new BufferedReader( new InputStreamReader( MainProgram.class.getResourceAsStream( "help.txt" ) ) ) ) {
+		MainProgram mp = new MainProgram();
+		mp.args = args;
 
-			String line = null;
-			while ( ( line = br.readLine() ) != null )
-				System.out.println( line );
-
-		} catch ( Exception e ) {
-			System.out.println( "Error printing help." );
-		}
+		CommandLine.run(mp, args);
 	}
 
 	/**
 	 * Print runtime info to STD ERR
 	 * @throws Exception 
 	 */
-	public static void printRuntimeInfo() throws Exception {
+	public static void printRuntimeInfo() {
 
 		try( BufferedReader br = new BufferedReader( new InputStreamReader( MainProgram.class.getResourceAsStream( "run.txt" ) ) ) ) {
 
@@ -139,9 +114,8 @@ public class MainProgram {
 			
 			System.err.println( "" );
 
-		} catch ( Exception e ) {
-			System.out.println( "Error printing runtime information." );
-			throw e;
+		} catch( Exception e) {
+			;
 		}
 	}
 

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 public class CometParsingUtils {
 	
-	public static TideReportedPeptide getCometReportedPeptideForString(String reportedPeptide, TideResults tideResults) {
+	public static TideReportedPeptide getTideReportedPeptideForString(String reportedPeptide, TideResults tideResults) {
 		
 		for( TideReportedPeptide cometPeptide : tideResults.getPeptidePSMMap().keySet() ) {
 			if( cometPeptide.getReportedPeptideString().equals( reportedPeptide ) ) {

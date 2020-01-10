@@ -8,10 +8,9 @@ public class TidePSM {
 
 	private BigDecimal xCorr;
 	private BigDecimal deltaCn;
-	private BigDecimal deltaCnStar;
+	private BigDecimal deltaLCn;
 	private BigDecimal spScore;
 	private BigDecimal spRank;
-	private BigDecimal eValue;
 	private int hitRank;
 	
 	
@@ -20,26 +19,7 @@ public class TidePSM {
 	private int charge;
 	private BigDecimal retentionTime;
 
-	@Override
-	public String toString() {
-		return "CometPSM{" +
-				"xCorr=" + xCorr +
-				", deltaCn=" + deltaCn +
-				", deltaCnStar=" + deltaCnStar +
-				", spScore=" + spScore +
-				", spRank=" + spRank +
-				", eValue=" + eValue +
-				", hitRank=" + hitRank +
-				", scanNumber=" + scanNumber +
-				", precursorNeutralMass=" + precursorNeutralMass +
-				", charge=" + charge +
-				", retentionTime=" + retentionTime +
-				", peptideSequence='" + peptideSequence + '\'' +
-				", modifications=" + modifications +
-				", fdr=" + fdr +
-				", proteinNames=" + proteinNames +
-				'}';
-	}
+
 
 	private String peptideSequence;
 	
@@ -81,18 +61,15 @@ public class TidePSM {
 	public void setDeltaCn(BigDecimal deltaCn) {
 		this.deltaCn = deltaCn;
 	}
-	/**
-	 * @return the deltaCnStar
-	 */
-	public BigDecimal getDeltaCnStar() {
-		return deltaCnStar;
+
+	public BigDecimal getDeltaLCn() {
+		return deltaLCn;
 	}
-	/**
-	 * @param deltaCnStar the deltaCnStar to set
-	 */
-	public void setDeltaCnStar(BigDecimal deltaCnStar) {
-		this.deltaCnStar = deltaCnStar;
+
+	public void setDeltaLCn(BigDecimal deltaLCn) {
+		this.deltaLCn = deltaLCn;
 	}
+
 	/**
 	 * @return the spScore
 	 */
@@ -116,18 +93,6 @@ public class TidePSM {
 	 */
 	public void setSpRank(BigDecimal spRank) {
 		this.spRank = spRank;
-	}
-	/**
-	 * @return the eValue
-	 */
-	public BigDecimal geteValue() {
-		return eValue;
-	}
-	/**
-	 * @param eValue the eValue to set
-	 */
-	public void seteValue(BigDecimal eValue) {
-		this.eValue = eValue;
 	}
 	/**
 	 * @return the hitRank

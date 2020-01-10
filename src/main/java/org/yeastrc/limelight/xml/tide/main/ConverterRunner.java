@@ -49,11 +49,18 @@ public class ConverterRunner {
 			throw new Exception( "Could not find percolator xml file: " + percolatorXMLFile.getAbsolutePath() );
 		}
 
-		File percolatorLogFile = new File(conversionParameters.getCruxOutputDirectory(), CruxConstants.cruxOutputLogFileName );
+		File percolatorLogFile = new File(conversionParameters.getCruxOutputDirectory(), CruxConstants.percolatorOutputLogFileName);
 		if( percolatorLogFile.exists() ) {
 			System.err.println( "\tFound percolator log file: " + percolatorLogFile.getAbsolutePath() );
 		} else {
 			throw new Exception( "Could not find percolator log file: " + percolatorLogFile.getAbsolutePath() );
+		}
+
+		File tideLogFile = new File(conversionParameters.getCruxOutputDirectory(), CruxConstants.tideOutputLogFileName);
+		if( tideLogFile.exists() ) {
+			System.err.println( "\tFound tide log file: " + percolatorLogFile.getAbsolutePath() );
+		} else {
+			tideLogFile = null;
 		}
 
 		System.err.println( " Done." );
@@ -69,7 +76,7 @@ public class ConverterRunner {
 		System.err.println( " Done." );
 
 		System.err.print( "\tVerifying all percolator results have comet results..." );
-		CometPercolatorValidator.validateData(tideResults, percResults, fileIndex );
+		CometPercolatorValidator.validateData(tideResults, percResults );
 		System.err.println( " Done." );
 
 		System.err.print( "\tWriting out XML..." );
@@ -77,8 +84,8 @@ public class ConverterRunner {
 				conversionParameters,
 				tideResults,
 				percResults,
-				cruxOutputParams,
-
+				tideLogFile,
+				percolatorLogFile
 				);
 
 		System.err.println( " Done." );
