@@ -33,7 +33,7 @@ public class ConverterRunner {
 	
 	public void convertCruxTidePercolatorToLimelightXML(ConversionParameters conversionParameters ) throws Throwable {
 
-		System.err.print( "Determining location of Crux output files..." );
+		System.err.println( "Determining location of Crux output files..." );
 
 		File pepXMLFile = new File(conversionParameters.getCruxOutputDirectory(), CruxConstants.cruxOutputTidePepXMLFileName );
 		if( pepXMLFile.exists() ) {
@@ -63,23 +63,19 @@ public class ConverterRunner {
 			tideLogFile = null;
 		}
 
-		System.err.println( " Done." );
-
-		System.err.print( "Reading Percolator XML data into memory..." );
+		System.err.print( "\nReading Percolator XML data into memory..." );
 		PercolatorResults percResults = PercolatorResultsReader.getPercolatorResults( percolatorXMLFile );
-		System.err.print( " Got " + percResults.getReportedPeptideResults().size() + " peptides. " );
-		System.err.println( " Done." );
+		System.err.println( " Found " + percResults.getReportedPeptideResults().size() + " peptides. " );
 
 
-		System.err.println( "\nReading pepXML file..." );
+		System.err.print( "Reading pepXML file..." );
 		TideResults tideResults = TidePepXMLResultsParser.getTideResults( pepXMLFile );
-		System.err.println( " Done." );
+		System.err.println( " Found " + tideResults.getPeptidePSMMap().size() + " peptides. " );
 
-		System.err.print( "\tVerifying all percolator results have comet results..." );
+		System.err.println( "Verifying all percolator results have comet results..." );
 		TidePercolatorValidator.validateData(tideResults, percResults );
-		System.err.println( " Done." );
 
-		System.err.print( "\tWriting out XML..." );
+		System.err.print( "\nWriting out XML..." );
 		(new XMLBuilder()).buildAndSaveXML(
 				conversionParameters,
 				tideResults,

@@ -32,8 +32,8 @@ public class PSMAnnotationTypes {
 
 	// comet scores
 	public static final String TIDE_ANNOTATION_TYPE_XCORR = "XCorr";
-	public static final String TIDE_ANNOTATION_TYPE_DELTACN = "DeltaCN";
-	public static final String TIDE_ANNOTATION_TYPE_DELTALCN = "DeltaLCN*";
+	public static final String TIDE_ANNOTATION_TYPE_DELTACN = "DeltaCn";
+	public static final String TIDE_ANNOTATION_TYPE_DELTALCN = "DeltaLCn";
 	public static final String TIDE_ANNOTATION_TYPE_SPSCORE = "Sp Score";
 	public static final String TIDE_ANNOTATION_TYPE_SPRANK = "Sp Rank";
 	public static final String TIDE_ANNOTATION_TYPE_HIT_RANK = "Hit Rank";

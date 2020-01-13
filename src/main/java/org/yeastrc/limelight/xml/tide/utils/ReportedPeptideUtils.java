@@ -61,7 +61,6 @@ public class ReportedPeptideUtils {
 			sb.append( "c[" + v.toString() + "]" );
 		}
 
-		System.out.println(sb.toString());
-		return sb.toString();	
+		return sb.toString();
 	}	
 }
