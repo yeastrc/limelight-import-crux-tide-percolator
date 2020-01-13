@@ -47,7 +47,7 @@ public class MainProgram implements Runnable {
 	private File fastaFile;
 
 	@CommandLine.Option(names = { "-o", "--out-file" }, required = true, description = "Full path to use for the Limelight XML output file (including file name).")
-	private File outFile;
+	private String outFile;
 
 	@CommandLine.Option(names = { "-v", "--verbose" }, required = false, description = "If this parameter is present, error messages will include a full stacktrace. Helpful for debugging.")
 	private boolean verboseRequested = false;
@@ -74,11 +74,16 @@ public class MainProgram implements Runnable {
 		}
 
 		ConversionProgramInfo cpi = ConversionProgramInfo.createInstance( String.join( " ",  args ) );
-		ConversionParameters cp = new ConversionParameters(cruxOutputDirectory, fastaFile, outFile);
+		ConversionParameters cp = new ConversionParameters(cruxOutputDirectory, fastaFile, outFile, cpi);
 
 		try {
 			ConverterRunner.createInstance().convertCruxTidePercolatorToLimelightXML(cp);
 		} catch( Throwable t ) {
+
+			if(verboseRequested) {
+				t.printStackTrace();
+			}
+
 			System.err.println( "Encountered error during conversion: " + t.getMessage() );
 			System.exit( 1 );
 		}

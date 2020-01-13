@@ -4,12 +4,14 @@ import static java.lang.Math.toIntExact;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.yeastrc.limelight.xml.tide.objects.TidePSM;
@@ -77,7 +79,7 @@ public class TidePepXMLParsingUtils {
 					if(xMod.getVariable().equals("N")) {
 						// we have a static mod
 
-						BigDecimal totalMass = xMod.getMass();
+						BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.FLOOR );
 						BigDecimal massDiff = xMod.getMassdiff();
 						String residue = xMod.getAminoacid();
 
@@ -107,7 +109,7 @@ public class TidePepXMLParsingUtils {
 					if(xMod.getVariable().equals("Y")) {
 						// we have a static mod
 
-						BigDecimal totalMass = xMod.getMass();
+						BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.FLOOR );
 						BigDecimal massDiff = xMod.getMassdiff();
 						String residue = xMod.getAminoacid();
 
@@ -165,13 +167,18 @@ public class TidePepXMLParsingUtils {
 	 * @return
 	 * @throws Throwable
 	 */
-	public static MsmsPipelineAnalysis getMSmsPipelineAnalysis( File file ) throws Throwable {
+	public static MsmsPipelineAnalysis getMSmsPipelineAnalysis( File file ) throws JAXBException {
 		
-		JAXBContext jaxbContext = JAXBContext.newInstance(MsmsPipelineAnalysis.class);
-		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-		MsmsPipelineAnalysis msAnalysis = (MsmsPipelineAnalysis)jaxbUnmarshaller.unmarshal( file );
-		
-		return msAnalysis;
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(MsmsPipelineAnalysis.class);
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+			jaxbUnmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
+			MsmsPipelineAnalysis msAnalysis = (MsmsPipelineAnalysis) jaxbUnmarshaller.unmarshal(file);
+
+			return msAnalysis;
+		} catch(JAXBException e) {
+			throw e;
+		}
 	}
 	
 	/**

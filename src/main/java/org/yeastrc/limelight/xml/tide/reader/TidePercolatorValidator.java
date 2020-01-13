@@ -6,7 +6,7 @@ import org.yeastrc.limelight.xml.tide.objects.TideReportedPeptide;
 import org.yeastrc.limelight.xml.tide.objects.TideResults;
 import org.yeastrc.limelight.xml.tide.utils.CometParsingUtils;
 
-public class CometPercolatorValidator {
+public class TidePercolatorValidator {
 
 	/**
 	 * Ensure all percolator results have a result in the comet data
@@ -23,7 +23,7 @@ public class CometPercolatorValidator {
 			PercolatorPeptideData percolatorPeptideData = percolatorResults.getReportedPeptideResults().get( percolatorReportedPeptide );
 
 			if( tideReportedPeptide == null ) {
-				throw new Exception( "Error: Comet results not found for peptide: " + percolatorReportedPeptide );
+				throw new Exception( "Error: Tide results not found for peptide: " + percolatorReportedPeptide );
 			}
 
 			for( int scanNumber : percolatorPeptideData.getPercolatorPSMs().keySet() ) {
@@ -36,5 +36,4 @@ public class CometPercolatorValidator {
 		}
 
 	}
-	
 }

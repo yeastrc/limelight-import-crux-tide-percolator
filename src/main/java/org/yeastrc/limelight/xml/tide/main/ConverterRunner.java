@@ -76,7 +76,7 @@ public class ConverterRunner {
 		System.err.println( " Done." );
 
 		System.err.print( "\tVerifying all percolator results have comet results..." );
-		CometPercolatorValidator.validateData(tideResults, percResults );
+		TidePercolatorValidator.validateData(tideResults, percResults );
 		System.err.println( " Done." );
 
 		System.err.print( "\tWriting out XML..." );

@@ -29,6 +29,26 @@ public class TidePSM {
 
 	private Collection<String> proteinNames;
 
+	@Override
+	public String toString() {
+		return "TidePSM{" +
+				"xCorr=" + xCorr +
+				", deltaCn=" + deltaCn +
+				", deltaLCn=" + deltaLCn +
+				", spScore=" + spScore +
+				", spRank=" + spRank +
+				", hitRank=" + hitRank +
+				", scanNumber=" + scanNumber +
+				", precursorNeutralMass=" + precursorNeutralMass +
+				", charge=" + charge +
+				", retentionTime=" + retentionTime +
+				", peptideSequence='" + peptideSequence + '\'' +
+				", modifications=" + modifications +
+				", fdr=" + fdr +
+				", proteinNames=" + proteinNames +
+				'}';
+	}
+
 	public Collection<String> getProteinNames() {
 		return proteinNames;
 	}

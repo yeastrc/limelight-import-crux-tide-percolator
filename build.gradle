@@ -58,7 +58,7 @@ jar {
 }
 
 shadowJar {
-    baseName = 'tideToLimelightXML'
+    baseName = 'cruxTide2LimelightXML'
     classifier = null
     version = null
 }
