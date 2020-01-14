@@ -14,6 +14,20 @@ How To Run
 Command line documentation
 ---------------------------
 
+NOTE: Tide currently contains a couple of issues in its pepxml output. Fixes to tide are currently pending; however,
+you may run the following *nix commands to "fix" the pepxml so that it may be processed by this
+converter:
+
+In the crux-output directory, create a backup of your tide-search.target.pep.xml file. The run the following commands:
+
+```
+perl -p -i -e 's/num_tol_term=\"\"/num_tol_term=\"2\"/g' tide-search.target.pep.xml
+perl -p -i -e 's/date=\".+?\" /date=\"2020-01-07T17:05:18\" /g' tide-search.target.pep.xml
+perl -0777 -p -i -e 's/<\/modification_info>\n<modification_info.+//g' tide-search.target.pep.xml
+```
+
+Once that's done you may use the converter as:
+
 Usage: java -jar cruxTide2LimelightXML.jar -d path -f path -o path
 
 Example: java -jar cruxTide2LimelightXML.jar
