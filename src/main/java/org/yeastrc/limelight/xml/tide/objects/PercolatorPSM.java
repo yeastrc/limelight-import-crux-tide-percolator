@@ -18,50 +18,36 @@
 
 package org.yeastrc.limelight.xml.tide.objects;
 
+import java.util.Objects;
+
 public class PercolatorPSM {
-	
-	
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+
 	@Override
-	public String toString() {
-		return "PercolatorPSM [svmScore=" + svmScore + ", qValue=" + qValue + ", pValue=" + pValue + ", pep=" + pep
-				+ ", reportedPeptide=" + reportedPeptide + ", psmId=" + psmId + ", scanNumber=" + scanNumber + "]";
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		PercolatorPSM that = (PercolatorPSM) o;
+		return scanNumber == that.scanNumber &&
+				reportedPeptide.equals(that.reportedPeptide);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((psmId == null) ? 0 : psmId.hashCode());
-		return result;
+		return Objects.hash(reportedPeptide, scanNumber);
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		PercolatorPSM other = (PercolatorPSM) obj;
-		if (psmId == null) {
-			if (other.psmId != null)
-				return false;
-		} else if (!psmId.equals(other.psmId))
-			return false;
-		return true;
+	public String toString() {
+		return "PercolatorPSM{" +
+				"svmScore=" + svmScore +
+				", qValue=" + qValue +
+				", pValue=" + pValue +
+				", pep=" + pep +
+				", reportedPeptide='" + reportedPeptide + '\'' +
+				", scanNumber=" + scanNumber +
+				'}';
 	}
-	
+
 	/**
 	 * @return the svmScore
 	 */
@@ -123,18 +109,6 @@ public class PercolatorPSM {
 		this.reportedPeptide = reportedPeptide;
 	}
 	/**
-	 * @return the psmId
-	 */
-	public String getPsmId() {
-		return psmId;
-	}
-	/**
-	 * @param psmId the psmId to set
-	 */
-	public void setPsmId(String psmId) {
-		this.psmId = psmId;
-	}
-	/**
 	 * @return the scanNumber
 	 */
 	public int getScanNumber() {
@@ -151,6 +125,5 @@ public class PercolatorPSM {
 	private double pValue;
 	private double pep;
 	private String reportedPeptide;
-	private String psmId;
 	private int scanNumber;
 }
