@@ -75,7 +75,7 @@ public class XMLBuilder {
 			FilterablePsmAnnotationTypes filterablePsmAnnotationTypes = new FilterablePsmAnnotationTypes();
 			psmAnnotationTypes.setFilterablePsmAnnotationTypes( filterablePsmAnnotationTypes );
 			
-			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_TIDE ) ) {
+			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_TIDE, tideResults.isComputeSp() ) ) {
 				filterablePsmAnnotationTypes.getFilterablePsmAnnotationType().add( annoType );
 			}
 			
@@ -99,7 +99,7 @@ public class XMLBuilder {
 			FilterablePsmAnnotationTypes filterablePsmAnnotationTypes = new FilterablePsmAnnotationTypes();
 			psmAnnotationTypes.setFilterablePsmAnnotationTypes( filterablePsmAnnotationTypes );
 			
-			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_PERCOLATOR ) ) {
+			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_PERCOLATOR, null ) ) {
 				filterablePsmAnnotationTypes.getFilterablePsmAnnotationType().add( annoType );
 			}
 			

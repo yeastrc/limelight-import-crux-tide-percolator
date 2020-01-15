@@ -46,7 +46,7 @@ public class PSMAnnotationTypes {
 
 	
 	
-	public static List<FilterablePsmAnnotationType> getFilterablePsmAnnotationTypes( String programName ) {
+	public static List<FilterablePsmAnnotationType> getFilterablePsmAnnotationTypes( String programName, Boolean wasSpComputed ) {
 		List<FilterablePsmAnnotationType> types = new ArrayList<FilterablePsmAnnotationType>();
 
 		if( programName.equals( Constants.PROGRAM_NAME_TIDE ) ) {
@@ -79,31 +79,32 @@ public class PSMAnnotationTypes {
 
 			{
 				FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
-				type.setName( TIDE_ANNOTATION_TYPE_SPSCORE );
-				type.setDescription( "Score indicating how well theoretical and actual peaks matched." );
-				type.setFilterDirection( FilterDirectionType.ABOVE );
-				
-				types.add( type );
-			}
-
-			{
-				FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
-				type.setName( TIDE_ANNOTATION_TYPE_SPRANK );
-				type.setDescription( "The rank of this peptide match for this spectrum based on Sp Score" );
-				type.setFilterDirection( FilterDirectionType.BELOW );
-				
-				types.add( type );
-			}
-
-			
-			{
-				FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
 				type.setName( TIDE_ANNOTATION_TYPE_HIT_RANK );
 				type.setDescription( "The rank of this PSM for this scan. Rank 1 means highest scoring hit." );
 				type.setFilterDirection( FilterDirectionType.BELOW );
 				type.setDefaultFilterValue( BigDecimal.valueOf( 1 ) );
-				
+
 				types.add( type );
+			}
+
+			if(wasSpComputed != null && wasSpComputed) {
+				{
+					FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
+					type.setName(TIDE_ANNOTATION_TYPE_SPSCORE);
+					type.setDescription("Score indicating how well theoretical and actual peaks matched.");
+					type.setFilterDirection(FilterDirectionType.ABOVE);
+
+					types.add(type);
+				}
+
+				{
+					FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
+					type.setName(TIDE_ANNOTATION_TYPE_SPRANK);
+					type.setDescription("The rank of this peptide match for this spectrum based on Sp Score");
+					type.setFilterDirection(FilterDirectionType.BELOW);
+
+					types.add(type);
+				}
 			}
 			
 		}
