@@ -23,6 +23,7 @@ In the crux-output directory, create a backup of your tide-search.target.pep.xml
 ```
 perl -p -i -e 's/num_tol_term=\"\"/num_tol_term=\"2\"/g' tide-search.target.pep.xml
 perl -p -i -e 's/date=\".+?\" /date=\"2020-01-07T17:05:18\" /g' tide-search.target.pep.xml
+perl -p -i -e 's/mass=\"nan\"/mass=\"0.0\"/g' tide-search.target.pep.xml
 perl -0777 -p -i -e 's/<\/modification_info>\n<modification_info.+//g' tide-search.target.pep.xml
 ```
 
