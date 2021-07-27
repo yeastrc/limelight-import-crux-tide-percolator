@@ -79,15 +79,29 @@ public class TidePepXMLParsingUtils {
 					if(xMod.getVariable().equals("N")) {
 						// we have a static mod
 
-						BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.FLOOR );
-						BigDecimal massDiff = xMod.getMassdiff();
-						String residue = xMod.getAminoacid();
+						{
+							BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.HALF_DOWN).stripTrailingZeros();
+							BigDecimal massDiff = xMod.getMassdiff();
+							String residue = xMod.getAminoacid();
 
-						if(!staticMods.containsKey(totalMass)) {
-							staticMods.put(totalMass, new HashMap<>());
+							if (!staticMods.containsKey(totalMass)) {
+								staticMods.put(totalMass, new HashMap<>());
+							}
+
+							staticMods.get(totalMass).put(residue, massDiff);
 						}
 
-						staticMods.get(totalMass).put(residue, massDiff);
+						{
+							BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.FLOOR).stripTrailingZeros();
+							BigDecimal massDiff = xMod.getMassdiff();
+							String residue = xMod.getAminoacid();
+
+							if (!staticMods.containsKey(totalMass)) {
+								staticMods.put(totalMass, new HashMap<>());
+							}
+
+							staticMods.get(totalMass).put(residue, massDiff);
+						}
 					}
 				}
 
@@ -107,17 +121,32 @@ public class TidePepXMLParsingUtils {
 
 				for(SearchSummary.AminoacidModification xMod : searchSummary.getAminoacidModification() ) {
 					if(xMod.getVariable().equals("Y")) {
-						// we have a static mod
+						// we have a var mod
 
-						BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.FLOOR );
-						BigDecimal massDiff = xMod.getMassdiff();
-						String residue = xMod.getAminoacid();
+						{
+							BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.FLOOR).stripTrailingZeros();
+							BigDecimal massDiff = xMod.getMassdiff();
+							String residue = xMod.getAminoacid();
 
-						if(!dynamicMods.containsKey(totalMass)) {
-							dynamicMods.put(totalMass, new HashMap<>());
+							if (!dynamicMods.containsKey(totalMass)) {
+								dynamicMods.put(totalMass, new HashMap<>());
+							}
+
+							dynamicMods.get(totalMass).put(residue, massDiff);
 						}
 
-						dynamicMods.get(totalMass).put(residue, massDiff);
+						{
+							BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros();
+							BigDecimal massDiff = xMod.getMassdiff();
+							String residue = xMod.getAminoacid();
+
+							if (!dynamicMods.containsKey(totalMass)) {
+								dynamicMods.put(totalMass, new HashMap<>());
+							}
+
+							dynamicMods.get(totalMass).put(residue, massDiff);
+						}
+
 					}
 				}
 
@@ -177,6 +206,7 @@ public class TidePepXMLParsingUtils {
 
 			return msAnalysis;
 		} catch(JAXBException e) {
+
 			throw e;
 		}
 	}
