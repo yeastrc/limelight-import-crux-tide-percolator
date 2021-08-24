@@ -51,6 +51,29 @@ public class TidePepXMLParsingUtils {
 		return false;
 	}
 
+	/**
+	 * Attempt to get whether or not exact p-value was computed. Return false if it cannot be determined.
+	 *
+	 * @param msAnalysis
+	 * @return
+	 */
+	public static boolean getIsExactPValueCalculatedFromXML( MsmsPipelineAnalysis msAnalysis ) {
+
+		for( MsmsRunSummary runSummary : msAnalysis.getMsmsRunSummary() ) {
+			for( SearchSummary searchSummary : runSummary.getSearchSummary() ) {
+
+				for( NameValueType nvt : searchSummary.getParameter() ) {
+					if(nvt.getName().equals("exact-p-value")) {
+						return Boolean.valueOf(nvt.getValueAttribute());
+					}
+				}
+
+			}
+		}
+
+		return false;
+	}
+
 	public static String getDecoyPrefixFromXML( MsmsPipelineAnalysis msAnalysis ) {
 
 		for( MsmsRunSummary runSummary : msAnalysis.getMsmsRunSummary() ) {
@@ -289,6 +312,8 @@ public class TidePepXMLParsingUtils {
 		psm.setDeltaLCn( getScoreForType( searchHit, "deltalcn" ) );
 		psm.setSpScore( getScoreForType( searchHit, "spscore" ) );
 		psm.setSpRank( getScoreForType( searchHit, "sprank" ) );
+		psm.setExactPvalue( getScoreForType( searchHit, "exact_pvalue" ) );
+		psm.setRefactoredXcorr( getScoreForType( searchHit, "refactored_xcorr" ) );
 
 		try {
 			psm.setProteinNames( getProteinNamesForSearchHit( searchHit, decoyPrefix ) );

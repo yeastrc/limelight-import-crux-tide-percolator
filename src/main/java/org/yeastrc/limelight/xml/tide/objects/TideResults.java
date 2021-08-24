@@ -7,6 +7,7 @@ public class TideResults {
 
 	private Map<TideReportedPeptide, Map<Integer, TidePSM>> peptidePSMMap;
 	private boolean computeSp = false;
+	private boolean exactPvalue = false;
 	private Map<BigDecimal, Map<String, BigDecimal>> staticMods;
 	private Map<BigDecimal, Map<String, BigDecimal>> dynamicMods;
 	private String decoyPrefix;
@@ -30,6 +31,14 @@ public class TideResults {
 
 	public void setComputeSp(boolean computeSp) {
 		this.computeSp = computeSp;
+	}
+
+	public boolean isExactPvalue() {
+		return exactPvalue;
+	}
+
+	public void setExactPvalue(boolean exactPvalue) {
+		this.exactPvalue = exactPvalue;
 	}
 
 	public Map<BigDecimal, Map<String, BigDecimal>> getStaticMods() {

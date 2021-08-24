@@ -8,6 +8,6 @@ public class Constants {
 	
 	public static final String CONVERSION_PROGRAM_NAME = "cruxTide2LimelightXML.jar";
 	public static final String CONVERSION_PROGRAM_URI = "https://github.com/yeastrc/limelight-import-crux-tide-percolator";
-	public static final String CONVERSION_PROGRAM_VERSION = "1.1.2";
+	public static final String CONVERSION_PROGRAM_VERSION = "1.2.0";
 	
 }

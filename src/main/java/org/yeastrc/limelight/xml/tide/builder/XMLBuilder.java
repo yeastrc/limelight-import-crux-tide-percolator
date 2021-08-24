@@ -75,7 +75,7 @@ public class XMLBuilder {
 			FilterablePsmAnnotationTypes filterablePsmAnnotationTypes = new FilterablePsmAnnotationTypes();
 			psmAnnotationTypes.setFilterablePsmAnnotationTypes( filterablePsmAnnotationTypes );
 			
-			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_TIDE, tideResults.isComputeSp() ) ) {
+			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_TIDE, tideResults.isComputeSp(), tideResults.isExactPvalue() ) ) {
 				filterablePsmAnnotationTypes.getFilterablePsmAnnotationType().add( annoType );
 			}
 			
@@ -99,7 +99,7 @@ public class XMLBuilder {
 			FilterablePsmAnnotationTypes filterablePsmAnnotationTypes = new FilterablePsmAnnotationTypes();
 			psmAnnotationTypes.setFilterablePsmAnnotationTypes( filterablePsmAnnotationTypes );
 			
-			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_PERCOLATOR, null ) ) {
+			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_PERCOLATOR, null, null ) ) {
 				filterablePsmAnnotationTypes.getFilterablePsmAnnotationType().add( annoType );
 			}
 			
@@ -138,7 +138,7 @@ public class XMLBuilder {
 		}
 		
 		//
-		// Define the default display order in proxl
+		// Define the default display order in limelight
 		//
 		AnnotationSortOrder xmlAnnotationSortOrder = new AnnotationSortOrder();
 		searchProgramInfo.setAnnotationSortOrder( xmlAnnotationSortOrder );
@@ -313,7 +313,7 @@ public class XMLBuilder {
 				FilterablePsmAnnotations xmlFilterablePsmAnnotations = new FilterablePsmAnnotations();
 				xmlPsm.setFilterablePsmAnnotations( xmlFilterablePsmAnnotations );
 
-				// handle comet scores
+				// handle tide scores
 				{
 					FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
 					xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
@@ -349,14 +349,39 @@ public class XMLBuilder {
 						xmlFilterablePsmAnnotation.setValue(psm.getSpScore());
 					}
 				}
-				{
-					FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
-					xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
 
-					xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_XCORR );
-					xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
-					xmlFilterablePsmAnnotation.setValue( psm.getxCorr() );
+				if(tideResults.isExactPvalue()) {
+
+					{
+						FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
+						xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+
+						xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_EXACT_PVALUE );
+						xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
+						xmlFilterablePsmAnnotation.setValue( psm.getExactPvalue() );
+					}
+
+					{
+						FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
+						xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+
+						xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_REFACTORED_XCORR );
+						xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
+						xmlFilterablePsmAnnotation.setValue( psm.getRefactoredXcorr() );
+					}
+
+				} else {
+					{
+						FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
+						xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+
+						xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_XCORR );
+						xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
+						xmlFilterablePsmAnnotation.setValue( psm.getxCorr() );
+					}
 				}
+
+
 				{
 					FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
 					xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );

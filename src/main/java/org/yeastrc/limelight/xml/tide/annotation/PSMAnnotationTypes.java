@@ -37,6 +37,9 @@ public class PSMAnnotationTypes {
 	public static final String TIDE_ANNOTATION_TYPE_SPSCORE = "Sp Score";
 	public static final String TIDE_ANNOTATION_TYPE_SPRANK = "Sp Rank";
 	public static final String TIDE_ANNOTATION_TYPE_HIT_RANK = "Hit Rank";
+	public static final String TIDE_ANNOTATION_TYPE_EXACT_PVALUE = "Exact p-value";
+	public static final String TIDE_ANNOTATION_TYPE_REFACTORED_XCORR = "Refactored XCorr";
+
 	
 	// percolator scores
 	public static final String PERCOLATOR_ANNOTATION_TYPE_QVALUE = "q-value";
@@ -46,16 +49,37 @@ public class PSMAnnotationTypes {
 
 	
 	
-	public static List<FilterablePsmAnnotationType> getFilterablePsmAnnotationTypes( String programName, Boolean wasSpComputed ) {
+	public static List<FilterablePsmAnnotationType> getFilterablePsmAnnotationTypes( String programName, Boolean wasSpComputed, Boolean isExactPvalue ) {
 		List<FilterablePsmAnnotationType> types = new ArrayList<FilterablePsmAnnotationType>();
 
 		if( programName.equals( Constants.PROGRAM_NAME_TIDE ) ) {
-			{
+
+			if(isExactPvalue) {
+
+				{
+					FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
+					type.setName(TIDE_ANNOTATION_TYPE_EXACT_PVALUE);
+					type.setDescription("Tide exact p-value calculation");
+					type.setFilterDirection(FilterDirectionType.BELOW);
+
+					types.add(type);
+				}
+
+				{
+					FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
+					type.setName(TIDE_ANNOTATION_TYPE_REFACTORED_XCORR);
+					type.setDescription("Tide refactored cross-correlation coefficient, triggered by exact p-value parameter.");
+					type.setFilterDirection(FilterDirectionType.ABOVE);
+
+					types.add(type);
+				}
+
+			} else {
 				FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
 				type.setName( TIDE_ANNOTATION_TYPE_XCORR );
 				type.setDescription( "Tide cross-correlation coefficient" );
 				type.setFilterDirection( FilterDirectionType.ABOVE );
-	
+
 				types.add( type );
 			}
 			

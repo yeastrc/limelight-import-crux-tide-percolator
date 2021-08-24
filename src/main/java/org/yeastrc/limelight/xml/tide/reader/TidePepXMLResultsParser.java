@@ -58,6 +58,7 @@ public class TidePepXMLResultsParser {
 		results.setPeptidePSMMap( resultMap );
 
 		results.setComputeSp( TidePepXMLParsingUtils.getIsSpCalculatedFromXML( msAnalysis ));
+		results.setExactPvalue( TidePepXMLParsingUtils.getIsExactPValueCalculatedFromXML( msAnalysis ));
 		results.setStaticMods( TidePepXMLParsingUtils.getStaticModsFromXML( msAnalysis ));
 		results.setDynamicMods( TidePepXMLParsingUtils.getDynamicModsFromXML( msAnalysis ));
 		results.setDecoyPrefix( TidePepXMLParsingUtils.getDecoyPrefixFromXML( msAnalysis ));

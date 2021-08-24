@@ -12,6 +12,8 @@ public class TidePSM {
 	private BigDecimal spScore;
 	private BigDecimal spRank;
 	private int hitRank;
+	private BigDecimal exactPvalue;
+	private BigDecimal refactoredXcorr;
 	
 	
 	private int scanNumber;
@@ -29,6 +31,7 @@ public class TidePSM {
 
 	private Collection<String> proteinNames;
 
+
 	@Override
 	public String toString() {
 		return "TidePSM{" +
@@ -38,6 +41,8 @@ public class TidePSM {
 				", spScore=" + spScore +
 				", spRank=" + spRank +
 				", hitRank=" + hitRank +
+				", exactPvalue=" + exactPvalue +
+				", refactoredXcorr=" + refactoredXcorr +
 				", scanNumber=" + scanNumber +
 				", precursorNeutralMass=" + precursorNeutralMass +
 				", charge=" + charge +
@@ -47,6 +52,22 @@ public class TidePSM {
 				", fdr=" + fdr +
 				", proteinNames=" + proteinNames +
 				'}';
+	}
+
+	public BigDecimal getExactPvalue() {
+		return exactPvalue;
+	}
+
+	public void setExactPvalue(BigDecimal exactPvalue) {
+		this.exactPvalue = exactPvalue;
+	}
+
+	public BigDecimal getRefactoredXcorr() {
+		return refactoredXcorr;
+	}
+
+	public void setRefactoredXcorr(BigDecimal refactoredXcorr) {
+		this.refactoredXcorr = refactoredXcorr;
 	}
 
 	public Collection<String> getProteinNames() {
