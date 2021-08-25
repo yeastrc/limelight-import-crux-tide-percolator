@@ -8,9 +8,18 @@ public class TideResults {
 	private Map<TideReportedPeptide, Map<Integer, TidePSM>> peptidePSMMap;
 	private boolean computeSp = false;
 	private boolean exactPvalue = false;
+	private String scoreFunction = "";
 	private Map<BigDecimal, Map<String, BigDecimal>> staticMods;
 	private Map<BigDecimal, Map<String, BigDecimal>> dynamicMods;
 	private String decoyPrefix;
+
+	public String getScoreFunction() {
+		return scoreFunction;
+	}
+
+	public void setScoreFunction(String scoreFunction) {
+		this.scoreFunction = scoreFunction;
+	}
 
 	/**
 	 * @return the peptidePSMMap

@@ -62,6 +62,7 @@ public class TidePepXMLResultsParser {
 		results.setStaticMods( TidePepXMLParsingUtils.getStaticModsFromXML( msAnalysis ));
 		results.setDynamicMods( TidePepXMLParsingUtils.getDynamicModsFromXML( msAnalysis ));
 		results.setDecoyPrefix( TidePepXMLParsingUtils.getDecoyPrefixFromXML( msAnalysis ));
+		results.setScoreFunction( TidePepXMLParsingUtils.getScoreFunction(msAnalysis));
 
 		for( MsmsRunSummary runSummary : msAnalysis.getMsmsRunSummary() ) {
 			for( SpectrumQuery spectrumQuery : runSummary.getSpectrumQuery() ) {

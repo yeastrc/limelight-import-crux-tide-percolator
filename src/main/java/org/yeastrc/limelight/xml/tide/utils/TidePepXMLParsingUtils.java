@@ -29,6 +29,29 @@ import net.systemsbiology.regis_web.pepxml.MsmsPipelineAnalysis.MsmsRunSummary.S
 public class TidePepXMLParsingUtils {
 
 	/**
+	 * Get the score function used in this running of tide.
+	 *
+	 * @param msAnalysis
+	 * @return
+	 */
+	public static String getScoreFunction(MsmsPipelineAnalysis msAnalysis) {
+
+		for( MsmsRunSummary runSummary : msAnalysis.getMsmsRunSummary() ) {
+			for( SearchSummary searchSummary : runSummary.getSearchSummary() ) {
+
+				for( NameValueType nvt : searchSummary.getParameter() ) {
+					if(nvt.getName().equals("score-function")) {
+						return nvt.getValueAttribute();
+					}
+				}
+
+			}
+		}
+
+		return "not found";
+	}
+
+	/**
 	 * Attempt to get whether or not sp was computed. Return false if it cannot be determined.
 	 *
 	 * @param msAnalysis
@@ -314,6 +337,9 @@ public class TidePepXMLParsingUtils {
 		psm.setSpRank( getScoreForType( searchHit, "sprank" ) );
 		psm.setExactPvalue( getScoreForType( searchHit, "exact_pvalue" ) );
 		psm.setRefactoredXcorr( getScoreForType( searchHit, "refactored_xcorr" ) );
+		psm.setResidueEvidenceScore( getScoreForType( searchHit, "res-ev score" ) );
+		psm.setResidueEvidencePvalue( getScoreForType( searchHit, "res-ev p-value" ) );
+		psm.setCombinedPvalue( getScoreForType( searchHit, "combined p-value" ) );
 
 		try {
 			psm.setProteinNames( getProteinNamesForSearchHit( searchHit, decoyPrefix ) );

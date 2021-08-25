@@ -21,6 +21,7 @@ import org.yeastrc.limelight.xml.tide.annotation.PeptideAnnotationTypeSortOrder;
 import org.yeastrc.limelight.xml.tide.annotation.PeptideAnnotationTypes;
 import org.yeastrc.limelight.xml.tide.annotation.PeptideDefaultVisibleAnnotationTypes;
 import org.yeastrc.limelight.xml.tide.constants.Constants;
+import org.yeastrc.limelight.xml.tide.constants.CruxConstants;
 import org.yeastrc.limelight.xml.tide.objects.*;
 import org.yeastrc.limelight.xml.tide.reader.PercolatorLogFileParser;
 import org.yeastrc.limelight.xml.tide.utils.CometParsingUtils;
@@ -75,7 +76,7 @@ public class XMLBuilder {
 			FilterablePsmAnnotationTypes filterablePsmAnnotationTypes = new FilterablePsmAnnotationTypes();
 			psmAnnotationTypes.setFilterablePsmAnnotationTypes( filterablePsmAnnotationTypes );
 			
-			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_TIDE, tideResults.isComputeSp(), tideResults.isExactPvalue() ) ) {
+			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_TIDE, tideResults.isComputeSp(), tideResults.isExactPvalue(), tideResults.getScoreFunction() ) ) {
 				filterablePsmAnnotationTypes.getFilterablePsmAnnotationType().add( annoType );
 			}
 			
@@ -99,7 +100,7 @@ public class XMLBuilder {
 			FilterablePsmAnnotationTypes filterablePsmAnnotationTypes = new FilterablePsmAnnotationTypes();
 			psmAnnotationTypes.setFilterablePsmAnnotationTypes( filterablePsmAnnotationTypes );
 			
-			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_PERCOLATOR, null, null ) ) {
+			for( FilterablePsmAnnotationType annoType : PSMAnnotationTypes.getFilterablePsmAnnotationTypes( Constants.PROGRAM_NAME_PERCOLATOR, null, null, null ) ) {
 				filterablePsmAnnotationTypes.getFilterablePsmAnnotationType().add( annoType );
 			}
 			
@@ -193,7 +194,14 @@ public class XMLBuilder {
 		//
 		ReportedPeptides reportedPeptides = new ReportedPeptides();
 		limelightInputRoot.setReportedPeptides( reportedPeptides );
-		
+
+		// shortcut to tide parameters
+		boolean isExactPvalue = tideResults.isExactPvalue();
+		String scoreFunction = tideResults.getScoreFunction();
+
+		boolean showXcorr = scoreFunction.equals(CruxConstants.SCORE_FUNCTION_XCORR) || scoreFunction.equals(CruxConstants.SCORE_FUNCTION_BOTH);
+		boolean showResidueEvidence = scoreFunction.equals(CruxConstants.SCORE_FUNCTION_RESIDUE_EVIDENCE) || scoreFunction.equals(CruxConstants.SCORE_FUNCTION_BOTH);
+
 		// iterate over each distinct reported peptide
 		for( String percolatorReportedPeptide : percolatorResults.getReportedPeptideResults().keySet() ) {
 
@@ -350,35 +358,68 @@ public class XMLBuilder {
 					}
 				}
 
-				if(tideResults.isExactPvalue()) {
+				if(isExactPvalue) {
 
-					{
+					if(showXcorr) {
+
+						{
+							FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
+							xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+
+							xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_EXACT_PVALUE );
+							xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
+							xmlFilterablePsmAnnotation.setValue( psm.getExactPvalue() );
+						}
+
+						{
+							FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
+							xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+
+							xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_REFACTORED_XCORR );
+							xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
+							xmlFilterablePsmAnnotation.setValue( psm.getRefactoredXcorr() );
+						}
+					}
+
+					if(showResidueEvidence) {
+
 						FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
 						xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
 
-						xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_EXACT_PVALUE );
+						xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_RESIDUE_EVIDENCE_PVALUE );
 						xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
-						xmlFilterablePsmAnnotation.setValue( psm.getExactPvalue() );
+						xmlFilterablePsmAnnotation.setValue( psm.getResidueEvidencePvalue() );
 					}
 
-					{
-						FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
-						xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+				} else if(scoreFunction.equals(CruxConstants.SCORE_FUNCTION_XCORR)) {
 
-						xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_REFACTORED_XCORR );
-						xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
-						xmlFilterablePsmAnnotation.setValue( psm.getRefactoredXcorr() );
-					}
+					FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
+					xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
 
-				} else {
-					{
-						FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
-						xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+					xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_XCORR );
+					xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
+					xmlFilterablePsmAnnotation.setValue( psm.getxCorr() );
+				}
 
-						xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_XCORR );
-						xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
-						xmlFilterablePsmAnnotation.setValue( psm.getxCorr() );
-					}
+				if(showResidueEvidence) {
+					FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
+					xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+
+					xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_RESIDUE_EVIDENCE_SCORE );
+					xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
+					xmlFilterablePsmAnnotation.setValue( psm.getResidueEvidenceScore() );
+				}
+
+
+
+				if(scoreFunction.equals(CruxConstants.SCORE_FUNCTION_BOTH)) {
+
+					FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
+					xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
+
+					xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.TIDE_ANNOTATION_TYPE_COMBINED_PVALUE );
+					xmlFilterablePsmAnnotation.setSearchProgram( Constants.PROGRAM_NAME_TIDE );
+					xmlFilterablePsmAnnotation.setValue( psm.getCombinedPvalue() );
 				}
 
 

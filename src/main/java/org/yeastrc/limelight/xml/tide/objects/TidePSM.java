@@ -14,23 +14,19 @@ public class TidePSM {
 	private int hitRank;
 	private BigDecimal exactPvalue;
 	private BigDecimal refactoredXcorr;
-	
+	private BigDecimal residueEvidenceScore;
+	private BigDecimal residueEvidencePvalue;
+	private BigDecimal combinedPvalue;
 	
 	private int scanNumber;
 	private BigDecimal precursorNeutralMass;
 	private int charge;
 	private BigDecimal retentionTime;
 
-
-
 	private String peptideSequence;
-	
 	private Map<Integer,BigDecimal> modifications;
-	
 	private BigDecimal fdr;
-
 	private Collection<String> proteinNames;
-
 
 	@Override
 	public String toString() {
@@ -43,6 +39,9 @@ public class TidePSM {
 				", hitRank=" + hitRank +
 				", exactPvalue=" + exactPvalue +
 				", refactoredXcorr=" + refactoredXcorr +
+				", residueEvidenceScore=" + residueEvidenceScore +
+				", residueEvidencePvalue=" + residueEvidencePvalue +
+				", combinedPvalue=" + combinedPvalue +
 				", scanNumber=" + scanNumber +
 				", precursorNeutralMass=" + precursorNeutralMass +
 				", charge=" + charge +
@@ -52,6 +51,30 @@ public class TidePSM {
 				", fdr=" + fdr +
 				", proteinNames=" + proteinNames +
 				'}';
+	}
+
+	public BigDecimal getResidueEvidenceScore() {
+		return residueEvidenceScore;
+	}
+
+	public void setResidueEvidenceScore(BigDecimal residueEvidenceScore) {
+		this.residueEvidenceScore = residueEvidenceScore;
+	}
+
+	public BigDecimal getResidueEvidencePvalue() {
+		return residueEvidencePvalue;
+	}
+
+	public void setResidueEvidencePvalue(BigDecimal residueEvidencePvalue) {
+		this.residueEvidencePvalue = residueEvidencePvalue;
+	}
+
+	public BigDecimal getCombinedPvalue() {
+		return combinedPvalue;
+	}
+
+	public void setCombinedPvalue(BigDecimal combinedPvalue) {
+		this.combinedPvalue = combinedPvalue;
 	}
 
 	public BigDecimal getExactPvalue() {

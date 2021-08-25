@@ -25,7 +25,7 @@ import java.util.List;
 import org.yeastrc.limelight.limelight_import.api.xml_dto.FilterDirectionType;
 import org.yeastrc.limelight.limelight_import.api.xml_dto.FilterablePsmAnnotationType;
 import org.yeastrc.limelight.xml.tide.constants.Constants;
-
+import org.yeastrc.limelight.xml.tide.constants.CruxConstants;
 
 
 public class PSMAnnotationTypes {
@@ -37,10 +37,12 @@ public class PSMAnnotationTypes {
 	public static final String TIDE_ANNOTATION_TYPE_SPSCORE = "Sp Score";
 	public static final String TIDE_ANNOTATION_TYPE_SPRANK = "Sp Rank";
 	public static final String TIDE_ANNOTATION_TYPE_HIT_RANK = "Hit Rank";
-	public static final String TIDE_ANNOTATION_TYPE_EXACT_PVALUE = "Exact p-value";
+	public static final String TIDE_ANNOTATION_TYPE_EXACT_PVALUE = "Exact P-value";
 	public static final String TIDE_ANNOTATION_TYPE_REFACTORED_XCORR = "Refactored XCorr";
+	public static final String TIDE_ANNOTATION_TYPE_RESIDUE_EVIDENCE_SCORE = "Res. Ev. Score";
+	public static final String TIDE_ANNOTATION_TYPE_RESIDUE_EVIDENCE_PVALUE = "Res. Ev. P-value";
+	public static final String TIDE_ANNOTATION_TYPE_COMBINED_PVALUE = "Combined P-value";
 
-	
 	// percolator scores
 	public static final String PERCOLATOR_ANNOTATION_TYPE_QVALUE = "q-value";
 	public static final String PERCOLATOR_ANNOTATION_TYPE_PVALUE = "p-value";
@@ -49,38 +51,75 @@ public class PSMAnnotationTypes {
 
 	
 	
-	public static List<FilterablePsmAnnotationType> getFilterablePsmAnnotationTypes( String programName, Boolean wasSpComputed, Boolean isExactPvalue ) {
+	public static List<FilterablePsmAnnotationType> getFilterablePsmAnnotationTypes( String programName, Boolean wasSpComputed, Boolean isExactPvalue, String scoreFunction ) {
 		List<FilterablePsmAnnotationType> types = new ArrayList<FilterablePsmAnnotationType>();
 
 		if( programName.equals( Constants.PROGRAM_NAME_TIDE ) ) {
 
+			boolean showXcorr = scoreFunction.equals(CruxConstants.SCORE_FUNCTION_XCORR) || scoreFunction.equals(CruxConstants.SCORE_FUNCTION_BOTH);
+			boolean showResidueEvidence = scoreFunction.equals(CruxConstants.SCORE_FUNCTION_RESIDUE_EVIDENCE) || scoreFunction.equals(CruxConstants.SCORE_FUNCTION_BOTH);
+
 			if(isExactPvalue) {
 
-				{
-					FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
-					type.setName(TIDE_ANNOTATION_TYPE_EXACT_PVALUE);
-					type.setDescription("Tide exact p-value calculation");
-					type.setFilterDirection(FilterDirectionType.BELOW);
+				if(showXcorr) {
 
-					types.add(type);
+					{
+						FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
+						type.setName(TIDE_ANNOTATION_TYPE_EXACT_PVALUE);
+						type.setDescription("Tide exact p-value calculation");
+						type.setFilterDirection(FilterDirectionType.BELOW);
+
+						types.add(type);
+					}
+
+					{
+						FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
+						type.setName(TIDE_ANNOTATION_TYPE_REFACTORED_XCORR);
+						type.setDescription("Tide refactored cross-correlation coefficient, triggered by exact p-value parameter.");
+						type.setFilterDirection(FilterDirectionType.ABOVE);
+
+						types.add(type);
+					}
 				}
 
-				{
-					FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
-					type.setName(TIDE_ANNOTATION_TYPE_REFACTORED_XCORR);
-					type.setDescription("Tide refactored cross-correlation coefficient, triggered by exact p-value parameter.");
-					type.setFilterDirection(FilterDirectionType.ABOVE);
+				if(showResidueEvidence) {
 
-					types.add(type);
+						FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
+						type.setName(TIDE_ANNOTATION_TYPE_RESIDUE_EVIDENCE_PVALUE);
+						type.setDescription("Tide residue evidence p-value.");
+						type.setFilterDirection(FilterDirectionType.BELOW);
+
+						types.add(type);
 				}
 
-			} else {
+			} else if(scoreFunction.equals(CruxConstants.SCORE_FUNCTION_XCORR)) {
+
 				FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
 				type.setName( TIDE_ANNOTATION_TYPE_XCORR );
 				type.setDescription( "Tide cross-correlation coefficient" );
 				type.setFilterDirection( FilterDirectionType.ABOVE );
 
 				types.add( type );
+			}
+
+
+			if(showResidueEvidence) {
+
+					FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
+					type.setName(TIDE_ANNOTATION_TYPE_RESIDUE_EVIDENCE_SCORE);
+					type.setDescription("Tide residue evidence score.");
+					type.setFilterDirection(FilterDirectionType.ABOVE);
+
+					types.add(type);
+			}
+
+			if(scoreFunction.equals(CruxConstants.SCORE_FUNCTION_BOTH)) {
+				FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
+				type.setName(TIDE_ANNOTATION_TYPE_COMBINED_PVALUE);
+				type.setDescription("Combined p-value from xcorr and residence evidence scoring.");
+				type.setFilterDirection(FilterDirectionType.BELOW);
+
+				types.add(type);
 			}
 			
 			{
