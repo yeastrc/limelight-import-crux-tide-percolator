@@ -126,7 +126,7 @@ public class TidePepXMLParsingUtils {
 						// we have a static mod
 
 						{
-							BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.HALF_DOWN).stripTrailingZeros();
+							BigDecimal totalMass = xMod.getMass().setScale(4, RoundingMode.HALF_DOWN).stripTrailingZeros();
 							BigDecimal massDiff = xMod.getMassdiff();
 							String residue = xMod.getAminoacid();
 
@@ -138,7 +138,7 @@ public class TidePepXMLParsingUtils {
 						}
 
 						{
-							BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.FLOOR).stripTrailingZeros();
+							BigDecimal totalMass = xMod.getMass().setScale(4, RoundingMode.FLOOR).stripTrailingZeros();
 							BigDecimal massDiff = xMod.getMassdiff();
 							String residue = xMod.getAminoacid();
 
@@ -170,7 +170,7 @@ public class TidePepXMLParsingUtils {
 						// we have a var mod
 
 						{
-							BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.FLOOR).stripTrailingZeros();
+							BigDecimal totalMass = xMod.getMass().setScale(4, RoundingMode.FLOOR).stripTrailingZeros();
 							BigDecimal massDiff = xMod.getMassdiff();
 							String residue = xMod.getAminoacid();
 
@@ -182,7 +182,7 @@ public class TidePepXMLParsingUtils {
 						}
 
 						{
-							BigDecimal totalMass = xMod.getMass().setScale(2, RoundingMode.HALF_UP).stripTrailingZeros();
+							BigDecimal totalMass = xMod.getMass().setScale(4, RoundingMode.HALF_UP).stripTrailingZeros();
 							BigDecimal massDiff = xMod.getMassdiff();
 							String residue = xMod.getAminoacid();
 
