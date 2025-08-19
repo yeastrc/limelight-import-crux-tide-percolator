@@ -13,6 +13,7 @@ on:
 env:
   DOCKER_REPO: "mriffle/crux-tide-percolator-to-limelight"
   EXECUTABLE_JAR: "cruxTide2LimelightXML.jar"
+  LIMELIGHT_RELEASE_TAG: ${{ github.event.release.tag_name }}
 
 jobs:
   dockerhub:
